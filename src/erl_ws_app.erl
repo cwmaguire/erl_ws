@@ -14,8 +14,27 @@ start(_Type, _Args) ->
     Path = "/",
     Handler = hello_handler,
     Bindings = [],
+
+    % Constraint examples to remind me that it's possible to:
+    %     - auto-convert to ints,
+    %     - validate whether the URL has correct bindings
+    %     - validate bindings and change (or augment) the binding value
+    %
+    % Bindings can be per host or per path
+    %
+    % ConstraintExamples = [{id, int},
+    %                       {type, function, fun(player) -> true end},
+    %                       {type, function, fun(enemy) -> {true, {some_value, some_other_value}} end}],
+    % HostWithConstraints = {Host, ConstraintExamples, Paths},
+    % PathWithConstraints = {Path, ConstraintExamples, Handler, Bindings},
+    %
+    % Can also compile and update routes on the fly:
+    %    cowboy:set_env(my_http_listener, dispatch, cowboy_router:compile(Dispatch)).
+
     Paths = [{Path, Handler, Bindings}],
-    Routes = [{AnyHost, Paths}],
+    _Routes = [{AnyHost, Paths},
+              {"[...]", [{"/host_path_info[...]", host_path_info_handler, _Bindings = []}]}],
+    Routes = [{"[...]", [{"/host_path_info", host_path_info_handler, _Bindings = []}]}],
     Dispatch = cowboy_router:compile(Routes),
     %Dispatch = cowboy_router:compile([{'_', [{"/", hello_handler, []}]} ]),
     cowboy:start_http(my_http_listener, 100, [{port, 8080}], [{env, [{dispatch, Dispatch}]}]),

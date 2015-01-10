@@ -13,11 +13,11 @@ init(_, Req, _Opts) ->
 
 handle(Req, State=#state{}) ->
     {HostInfo, Req2} = cowboy_req:host_info(Req),
-    {PathInfo, Req3} = cowboy_req:host_info(Req2),
+    {PathInfo, Req3} = cowboy_req:path_info(Req2),
     io:format("Found:~n\tHost Info: ~p~n\tPath Info: ~p~n", [HostInfo, PathInfo]),
     {ok, Req4} = cowboy_req:reply(200,
                                   [{<<"content-type">>, <<"text/plain">>}],
-                                  [<<"Host Info: ">>, HostInfo, <<" Path Info: ">>, PathInfo],
+                                  [<<"Host Info: ">>, HostInfo, <<"<br>Path Info: ">>, PathInfo],
                                   Req3),
     {ok, Req4, State}.
 

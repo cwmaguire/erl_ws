@@ -32,9 +32,10 @@ start(_Type, _Args) ->
     %    cowboy:set_env(my_http_listener, dispatch, cowboy_router:compile(Dispatch)).
 
     Paths = [{Path, Handler, Bindings}],
-    _Routes = [{AnyHost, Paths},
-              {"[...]", [{"/host_path_info[...]", host_path_info_handler, _Bindings = []}]}],
-    Routes = [{"[...]", [{"/host_path_info", host_path_info_handler, _Bindings = []}]}],
+    Routes = [{AnyHost, Paths}],
+    %Routes = [{"[...]", [{"/host_path_info/[...]", host_path_info_handler, _Bindings = []}]}],
+    %[...] in the host spec must be in a string
+    %[...] in the path spec must follow a slash
     Dispatch = cowboy_router:compile(Routes),
     %Dispatch = cowboy_router:compile([{'_', [{"/", hello_handler, []}]} ]),
     cowboy:start_http(my_http_listener, 100, [{port, 8080}], [{env, [{dispatch, Dispatch}]}]),

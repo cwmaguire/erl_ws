@@ -11,9 +11,6 @@
 %cowboy
 start(_Type, _Args) ->
     AnyHost = '_',
-    Path = "/",
-    Handler = hello_handler,
-    Bindings = [],
 
     % Constraint examples to remind me that it's possible to:
     %     - auto-convert to ints,
@@ -31,7 +28,9 @@ start(_Type, _Args) ->
     % Can also compile and update routes on the fly:
     %    cowboy:set_env(my_http_listener, dispatch, cowboy_router:compile(Dispatch)).
 
-    Paths = [{Path, Handler, Bindings}],
+    Paths = [{"/", hello_handler, _Bindings = []},
+             {"/form", cowboy_static, {priv_file, erl_ws, "static/form.html"}},
+             {"/simple_form", form_handler, _Bindings = []}],
     Routes = [{AnyHost, Paths}],
     %Routes = [{"[...]", [{"/host_path_info/[...]", host_path_info_handler, _Bindings = []}]}],
     %[...] in the host spec must be in a string

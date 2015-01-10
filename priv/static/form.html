@@ -2,14 +2,15 @@
 <body>
   <p>POST form</p>
   <form action="http://localhost:8080/simple_form" method="POST">
-    <input id="post_a" type="text">
-    <input id="post_b" type="text">
+    <!-- NAME IS REQUIRED -->
+    <input id="post_a" name="post_a" type="text" value="post_a">
+    <input id="post_b" name="post_b" type="text" value="post_b">
     <input type="submit" value="Submit">
   </form>
   <p>GET form</p>
   <form action="http://localhost:8080/simple_form" method="GET">
-    <input id="get_a" type="text">
-    <input id="get_b" type="text">
+    <input id="get_a" name="get_a" type="text" value="get_a">
+    <input id="get_b" name="get_b" type="text" value="get_b">
     <input type="submit" value="Submit">
   </form>
 </body>

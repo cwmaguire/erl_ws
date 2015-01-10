@@ -1,0 +1,8 @@
+Erlang Cowboy Webserver Experiment
+
+I want to play with autonomous graphical elements like boids and such,
+but I don't want to do all the code in JavaScript. JavaScript is very
+interesting but also sucks. Instead I want to do all the logic in Erlang
+and connect JavaScript to Erlang via the Cowboy Erlang webserver.
+
+To date I'm simply playing with Cowboy to get a feel for all of the options.

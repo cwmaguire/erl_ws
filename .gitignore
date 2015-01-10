@@ -1,0 +1,7 @@
+_rel
+deps
+ebin
+rel
+relx
+relx.config
+.erlang.mk.packages.v2

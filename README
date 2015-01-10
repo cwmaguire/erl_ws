@@ -6,3 +6,6 @@ interesting but also sucks. Instead I want to do all the logic in Erlang
 and connect JavaScript to Erlang via the Cowboy Erlang webserver.
 
 To date I'm simply playing with Cowboy to get a feel for all of the options.
+
+Eventually I want to set up a websocket and have JavaScript on a web page
+run all the logic asynchronously through Erlang.

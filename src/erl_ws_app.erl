@@ -51,7 +51,8 @@ start(_Type, _Args) ->
 
     Paths = [{"/hello", hello_handler, _Bindings = []},
              {"/", cowboy_static, {priv_file, erl_ws, "static/form.html"}},
-             {"/simple_form", form_handler, ?NO_OPTIONS},
+             {"/form", form_handler, ?NO_OPTIONS},
+             {"/chunked_form", chunked_handler, ?NO_OPTIONS},
              {"/constraints/:anything", constraints_handler, {constraints_met, true}},
              {"/constraints/:an_int/:three_chars/[:add_one]", Constraints, constraints_handler, {constraints_met, true}},
              {"/constraints/[...]", constraints_handler, {constraints_met, false}},

@@ -1,0 +1,46 @@
+<!--
+%% Copyright (c) 2015, Chris Maguire <cwmaguire@gmail.com>
+%%
+%% Permission to use, copy, modify, and/or distribute this software for any
+%% purpose with or without fee is hereby granted, provided that the above
+%% copyright notice and this permission notice appear in all copies.
+%%
+%% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+%% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+%% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+%% ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+%% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+%% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+%% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+%% Demonstrate sending a lot of POST data so the server can
+%% read it in chunks.
+-->
+
+<html>
+<body>
+  <p>POST form</p>
+  <form action="http://localhost:8080/chunked_form" method="POST">
+    <!-- NAME IS REQUIRED -->
+    <input id="post_a" name="post_a" type="text" value="post_a">
+    <input id="post_b" name="post_b" type="hidden" value="On Mondays, Wednesdays and Fridays it was Court Hand and Summulae
+Logicales, while the rest of the week it was the Organon, Repetition
+and Astrology.  The governess was always getting muddled with her
+astrolabe, and when she got specially muddled she would take it out of
+the Wart by rapping his knuckles.  She did not rap Kay's knuckles,
+because when Kay grew older he would be Sir Kay, the master of the
+estate.  The Wart was called the Wart because it more or less rhymed
+with Art, which was short for his real name.  Kay had given him the
+nickname.  Kay was not called anything but Kay, as he was too dignified
+to have a nickname and would have flown into a passion if anybody had
+tried to give him one.  The governess had red hair and some mysterious
+wound from which she derived a lot of prestige by showing it to all the
+women of the castle, behind closed doors.  It was believed to be where
+she sat down, and to have been caused by sitting on some armour at a
+picnic by mistake.  Eventually she offered to show it to Sir Ector, who
+was Kay's father, had hysterics and was sent away.  They found out
+afterwards that she had been in a lunatic hospital for three years.">
+    <input type="submit" value="Submit">
+  </form>
+</body>
+</html>

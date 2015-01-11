@@ -40,8 +40,20 @@ handle(Req, State=#state{}) ->
     {Host, Req3} = cowboy_req:host(Req2),
     {HostURL, Req4} = cowboy_req:host_url(Req3),
     {ok, Body, Req5} = cowboy_req:body(Req4),
-    {ok, QsKVs, Req6} = cowboy_req:body_qs(Req5),
+    %% See chunked_handler.erl for details on why {length, X} acts strangely
+    %% It also looks like there's a default minimum to the {read_length, X}
+    %{ok, Body, Req5} = cowboy_req:body(Req4, [{read_length, 27}]), %% length ignored because I've already called has_body?
+    %Body = "no body",
+    %Req5 = Req4,
+    %% body_qs will be empty if we've already read the body with cowboy_req:body(Req)
+    {ok, QsKVs, Req6} = cowboy_req:body_qs(Req5, [{length, 1}]), %% length doesn't seem to take
     io:format("Query string KV pairs:~n\t~p~n", [QsKVs]),
+    StringKVs = [["&nbsp;&nbsp;&nbsp;&nbsp;",
+                  "Key: ",
+                  binary_to_list(K),
+                  "; Val: ",
+                  binary_to_list(V),
+                  "<br>"] || {K, V} <- QsKVs],
 
     {Path, Req7} = cowboy_req:path(Req6),
     {Peer, Req8} = cowboy_req:peer(Req7),
@@ -58,6 +70,7 @@ handle(Req, State=#state{}) ->
          "Host: ", Host, "<br>",
          "Host URL: ", HostURL, "<br>",
          "Body: ", Body, "<br>",
+         "Body KVs: <br>", StringKVs, "<br>",
          "Path: ", Path, "<br>",
          "Peer: ", peer_to_list(Peer), "<br>",
          "Port: ", integer_to_list(Port), "<br>",

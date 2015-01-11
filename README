@@ -9,3 +9,18 @@ To date I'm simply playing with Cowboy to get a feel for all of the options.
 
 Eventually I want to set up a websocket and have JavaScript on a web page
 run all the logic asynchronously through Erlang.
+
+This experiment serves as a reference application showing how different
+Cowboy features work:
+- Form POST handling
+- Form GET handling
+- Reading request body
+- Host [...] binding
+- Path [...] binding
+- Various cowboy_req functions
+- Static files
+- Static file directory
+- Path constraints - int
+- Path constraints - boolean
+- Path constraints - updated value
+- Optional path bindings

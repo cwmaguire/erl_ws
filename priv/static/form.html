@@ -1,3 +1,27 @@
+<!--
+%% Copyright (c) 2015, Chris Maguire <cwmaguire@gmail.com>
+%%
+%% Permission to use, copy, modify, and/or distribute this software for any
+%% purpose with or without fee is hereby granted, provided that the above
+%% copyright notice and this permission notice appear in all copies.
+%%
+%% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+%% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+%% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+%% ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+%% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+%% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+%% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+%% POST and GET forms for use with form_handler.erl
+%%
+%% Demonstrates how to send POST data (in the request body) and
+%% GET data (on the querystring) to a server.
+%%
+%% <localhost>/simple_form is routed to form_handler in the routing
+%% rules found in erl_ws_app.erl
+-->
+
 <html>
 <body>
   <p>POST form</p>
@@ -13,5 +37,13 @@
     <input id="get_b" name="get_b" type="text" value="get_b">
     <input type="submit" value="Submit">
   </form>
+  <p>Test URLS</p>
+  <a href="http://localhost:8080/constraints/99/xYz/1">http://localhost:8080/constraints/99/xYz/1 (constraints met)</a>
+  <br>
+  <a href="http://localhost:8080/constraints/99/xYz">http://localhost:8080/constraints/99/xYz (last constraint is optional)</a>
+  <br>
+  <a href="http://localhost:8080/constraints/a/xYz/1">http://localhost:8080/constraints/a/xYz/1 (first binding not an int)</a>
+  <br>
+  <a href="http://localhost:8080/constraints/99/abcd/1">http://localhost:8080/constraints/99/abcd/1 (more than three chars in second binding)</a>
 </body>
 </html>

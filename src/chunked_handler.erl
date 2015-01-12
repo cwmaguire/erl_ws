@@ -32,13 +32,11 @@ handle(Req, State=#state{}) ->
 
     {BodyChunks, Req2} = body(Req),
 
-    {ok, Req3} = cowboy_req:reply(200,
-        [{<<"content-type">>, <<"text/html">>}],
-        ["<html><body>",
-         "Has body: ", atom_to_list(HasBody), "<br>",
-         "Body: <br>", BodyChunks, "<br>",
-         "</body></html>"],
-        Req2),
+    {ok, Req3} = cowboy_req:chunked_reply(200, [{<<"content-type">>, <<"text/html">>}], Req2),
+    ok = cowboy_req:chunk(["<html><body>"], Req3),
+    ok = cowboy_req:chunk(["Has body: ", atom_to_list(HasBody), "<br>"], Req3),
+    ok = cowboy_req:chunk(["Body: <br>", BodyChunks, "<br>"], Req3),
+    ok = cowboy_req:chunk(["</body></html>"], Req3),
     {ok, Req3, State}.
 
 terminate(_Reason, _Req, _State) ->

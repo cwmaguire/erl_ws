@@ -13,12 +13,12 @@
 %% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 %% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-%% POST and GET forms for use with form_handler.erl
+%% Send and receive data on a websocket
 %%
-%% Demonstrates how to send POST data (in the request body) and
-%% GET data (on the querystring) to a server.
+%% Demonstrates how to open a websocket connection, get notified when
+%% the websocket is open, send data and receive data.
 %%
-%% <localhost>/simple_form is routed to form_handler in the routing
+%% <localhost>/websocket is routed to websocket_handler in the routing
 %% rules found in erl_ws_app.erl
 -->
 

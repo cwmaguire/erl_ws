@@ -24,3 +24,6 @@ Cowboy features work:
 - Path constraints - boolean
 - Path constraints - updated value
 - Optional path bindings
+- Reading request body in chunks
+- Sending response in chunks
+- Websocket (server handler and web page)

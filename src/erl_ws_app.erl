@@ -56,6 +56,7 @@ start(_Type, _Args) ->
              {"/constraints/:anything", constraints_handler, {constraints_met, true}},
              {"/constraints/:an_int/:three_chars/[:add_one]", Constraints, constraints_handler, {constraints_met, true}},
              {"/constraints/[...]", constraints_handler, {constraints_met, false}},
+             {"/websocket", websocket_handler, ?NO_OPTIONS},
              {"/[...]", cowboy_static, {priv_dir, erl_ws, "static"}}],
 
     Routes = [{?ANY_HOST, Paths},

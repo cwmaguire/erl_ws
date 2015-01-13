@@ -27,3 +27,6 @@ Cowboy features work:
 - Reading request body in chunks
 - Sending response in chunks
 - Websocket (server handler and web page)
+
+Other features:
+- gen_server process per Websocket handler using simple_one_for_one supervisor child spec

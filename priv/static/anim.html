@@ -56,7 +56,8 @@
   };
 
   function start(){
-    exampleSocket.send("height:" + canvas.clientHeight + ";width:" + canvas.clientWidth);
+    exampleSocket.send("height:" + canvas.clientHeight);
+    exampleSocket.send("width:" + canvas.clientWidth);
     exampleSocket.send("start");
   }
 

@@ -19,7 +19,8 @@
 -export([start/1]).
 -export([stop/1]).
 -export([send/2]).
--export([handle/2]).
+-export([height/2]).
+-export([width/2]).
 -export([start_gen_server/1]).
 -export([init/1]).
 -export([handle_call/3]).
@@ -46,15 +47,11 @@ stop(Pid) ->
 send(Pid, Text) ->
     gen_server:call(Pid, {text, Text}).
 
-%% internal logic
+height(Pid, Height) ->
+    gen_server:cast(Pid, {height, Height}).
 
-handle(Binary = <<"height", _/binary>>, State) ->
-    Text = binary_to_list(Binary),
-    {"height:" ++ Height0, ";width:" ++ Width0} = lists:splitwith(fun($;) -> false; (_) -> true end, Text),
-    Height = list_to_integer(Height0),
-    Width = list_to_integer(Width0),
-    Reply = {text, ["Set height to ", Height0, " and width to ", Width0]},
-    {Reply, State#state{height = Height, width = Width}}.
+width(Pid, Width) ->
+    gen_server:cast(Pid, {width, Width}).
 
 %% gen_server logic
 
@@ -63,15 +60,12 @@ start_gen_server(AnimateWebSocketPid) ->
 
 init(AnimateWebsocketPid) ->
     io:format("animate gen_server init (~p, ~p) ~n", [self(), AnimateWebsocketPid]),
+    AnimateWebsocketPid ! {animator, self()},
     {ok, #state{animate_websocket_pid = AnimateWebsocketPid}}.
 
-handle_call({text, Text}, _From, State) ->
-    io:format("animate:handle_call({text, ~p}, ~p)~n", [Text, State]),
-    {Reply, State2} = handle(Text, State),
-    {reply, Reply, State2};
 handle_call(Request, From, State) ->
     io:format("animate:handle_call(~p, ~p, ~p)~n", [Request, From, State]),
-    {reply, the_reply, State}.
+    {reply, ok, State}.
 
 handle_cast(start, State = #state{running = false}) ->
     io:format("animate:handle_cast(start, ~p)~n", [State]),
@@ -80,6 +74,12 @@ handle_cast(start, State = #state{running = false}) ->
 handle_cast(stop, State = #state{running = true}) ->
     io:format("animate:handle_cast(stop, ~p)~n", [State]),
     {noreply, State#state{running = false}};
+handle_cast({height, Height}, State) ->
+    io:format("animate:handle_cast({height, ~p}, ~p)~n", [Height, State]),
+    {noreply, State#state{height = Height}};
+handle_cast({width, Width}, State) ->
+    io:format("animate:handle_cast({width, ~p}, ~p)~n", [Width, State]),
+    {noreply, State#state{width = Width}};
 handle_cast(Request, State) ->
     io:format("animate:handle_cast(~p, ~p)~n", [Request, State]),
     {noreply, State}.

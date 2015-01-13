@@ -12,8 +12,8 @@
 %% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 %% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-%% Demonstrate websocket handling
--module(websocket_handler).
+%% Route drawing commands to and from a web page to an Erlang process
+-module(animate_ws_handler).
 -behaviour(cowboy_http_handler).
 
 -export([init/3]).
@@ -37,17 +37,22 @@ websocket_init(_Type, Req, _Opts) ->
             io:format("Subprotocols found: ~p~n", [Subprotocols]),
             Req2
     end,
-    register(websocket, self()),
-    websocket ! "message sent from init",
+    register(animate_ws, self()),
     {ok, Req3, #state{}}.
 
+websocket_handle({text, StartStop}, Req, State) when StartStop == <<"start">>; StartStop == <<"stop">> ->
+    io:format("From Websocket: {text, ~p}~n", [StartStop]),
+    animate:(list_to_atom(binary_to_list(StartStop)))(),
+    %{ok, Req, State};
+    {reply, {text, ["Erlang received command: ", StartStop]}, Req, State};
 websocket_handle({FrameType, FrameContent}, Req, State) ->
-    io:format("From Websocket: {~p, ~p}~n", [FrameType, FrameContent]),
+    io:format("From Websocket (unrecognized): {~p, ~p}~n", [FrameType, FrameContent]),
+    %{ok, Req, State}.
     {reply, {text, ["Erlang received: ", FrameContent, " of type ", atom_to_list(FrameType)]}, Req, State}.
 
 websocket_info(ErlangMessage, Req, State) ->
     io:format("From Erlang: ~p~n", [ErlangMessage]),
-    {reply, {text, ["Erlang sends: ", ErlangMessage]}, Req, State}.
+    {reply, {text, ["Received from Erlang: ", ErlangMessage]}, Req, State}.
 
 handle(Req, State=#state{}) ->
     {ok, Req, State}.

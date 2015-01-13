@@ -1,0 +1,83 @@
+<!--
+%% Copyright (c) 2015, Chris Maguire <cwmaguire@gmail.com>
+%%
+%% Permission to use, copy, modify, and/or distribute this software for any
+%% purpose with or without fee is hereby granted, provided that the above
+%% copyright notice and this permission notice appear in all copies.
+%%
+%% THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+%% WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+%% MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+%% ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+%% WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+%% ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+%% OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+%% Draw in an HTML5 canvas with commands from a Websocket
+%%
+%% Connects to an Erlang Cowboy Websocket to trigger animation from
+%% Erlang.
+-->
+<html>
+<script language="JavaScript">
+  var exampleSocket;
+  var results;
+
+  function init(){
+    log("init");
+    results = document.getElementById("results");
+    exampleSocket = new WebSocket("ws://localhost:8080/animate");
+    exampleSocket.onopen = handle_ws_event;
+    exampleSocket.onmessage = handle_ws_message;
+    draw();
+  }
+
+  function handle_ws_event(event) {
+    if(event.type = "open"){
+      handle_ws_open();
+    }
+  }
+
+  function handle_ws_open(){
+    log("Websocket is OPEN!");
+    exampleSocket.send("Initial data sent from webpage after opening");
+  };
+
+  function handle_ws_message(event) {
+    log("Data from Websocket: " + event.data);
+  };
+
+  function start(){
+    exampleSocket.send("start");
+  }
+
+  function stop(){
+    exampleSocket.send("stop");
+  }
+
+  function log(str){
+    console.dir(str);
+    //results.innerHTML += "<br>" + str;
+  }
+
+  function draw() {
+    var canvas = document.getElementById("canvas");
+    if (canvas.getContext) {
+      var ctx = canvas.getContext("2d");
+
+      ctx.fillStyle = "rgb(200,0,0)";
+      ctx.fillRect (10, 10, 55, 50);
+
+      ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+      ctx.fillRect (30, 30, 55, 50);
+    }
+  }
+</script>
+<body onload="init();">
+  <button onclick="start();">Start</button>
+  <button onclick="stop();">Stop</button>
+  <br>
+  <canvas id=canvas></canvas>
+  <div id=results></div>
+</body>
+</html>

@@ -37,6 +37,7 @@ websocket_init(_Type, Req, _Opts) ->
             Req2
     end,
     {ok, AnimatorPid} = supervisor:start_child(erl_ws_sup, [self()]),
+    _MonitorRef = erlang:monitor(process, AnimatorPid),
     io:format("Websocket handler init (~p, ~p)~n", [self(), AnimatorPid]),
     {ok, Req3, #state{animator_pid = AnimatorPid}}.
 
@@ -45,14 +46,21 @@ websocket_handle({text, StartStop}, Req, State) when StartStop == <<"start">>; S
     animate:(list_to_atom(binary_to_list(StartStop)))(State#state.animator_pid),
     %{ok, Req, State};
     {reply, {text, ["Erlang received command: ", StartStop]}, Req, State};
+websocket_handle({text, FrameContent}, Req, State) ->
+    io:format("From Websocket: {text, ~p}~n", [FrameContent]),
+    Reply = animate:send(State#state.animator_pid, FrameContent),
+    {reply, Reply, Req, State};
 websocket_handle({FrameType, FrameContent}, Req, State) ->
-    io:format("From Websocket (unrecognized): {~p, ~p}~n", [FrameType, FrameContent]),
+    io:format("From Websocket (non-text): {~p, ~p}~n", [FrameType, FrameContent]),
     %{ok, Req, State}.
     {reply, {text, ["Erlang received: ", FrameContent, " of type ", atom_to_list(FrameType)]}, Req, State}.
 
+%websocket_info({'DOWN', _MonitorRef, process, Pid, Reason}, Req, State) ->
+    %io:format("Animator ~p crashed: ~p~n", [Pid, Reason]),
+    %{shutdown, Req, State};
 websocket_info(ErlangMessage, Req, State) ->
     io:format("From Erlang (presumably from ~p): ~p~n", [State#state.animator_pid, ErlangMessage]),
-    {reply, {text, ["Received from Erlang: ", ErlangMessage]}, Req, State}.
+    {reply, {text, [ErlangMessage]}, Req, State}.
 
 handle(Req, State=#state{}) ->
     {ok, Req, State}.

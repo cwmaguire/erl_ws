@@ -22,14 +22,16 @@
 <script language="JavaScript">
   var exampleSocket;
   var results;
+  var canvas;
 
   function init(){
     log("init");
     results = document.getElementById("results");
+    canvas = document.getElementById("canvas");
     exampleSocket = new WebSocket("ws://localhost:8080/animate");
     exampleSocket.onopen = handle_ws_event;
     exampleSocket.onmessage = handle_ws_message;
-    draw();
+    //draw();
   }
 
   function handle_ws_event(event) {
@@ -40,14 +42,21 @@
 
   function handle_ws_open(){
     log("Websocket is OPEN!");
-    exampleSocket.send("Initial data sent from webpage after opening");
+    //exampleSocket.send("Initial data sent from webpage after opening");
+    //exampleSocket.send("height:" + canvas.height + ";width:" + canvas.width);
   };
 
   function handle_ws_message(event) {
     log("Data from Websocket: " + event.data);
+    if(event.data.substring(0,1) == "{"){
+      draw(event.data);
+    }else{
+      log("" + event.data.substring(0,1) + " does not equal '{'");
+    }
   };
 
   function start(){
+    exampleSocket.send("height:" + canvas.clientHeight + ";width:" + canvas.clientWidth);
     exampleSocket.send("start");
   }
 
@@ -60,16 +69,20 @@
     //results.innerHTML += "<br>" + str;
   }
 
-  function draw() {
+  function draw(json) {
+    obj = JSON.parse(json);
     var canvas = document.getElementById("canvas");
     if (canvas.getContext) {
       var ctx = canvas.getContext("2d");
 
-      ctx.fillStyle = "rgb(200,0,0)";
-      ctx.fillRect (10, 10, 55, 50);
+      var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      log("fillStyle = " + fillStyle);
+      ctx.fillStyle = fillStyle;
+      ctx.fillRect (obj.x, obj.y, 50, 50);
+      //ctx.fillRect (10, 10, 55, 50);
 
-      ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-      ctx.fillRect (30, 30, 55, 50);
+      //ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
+      //ctx.fillRect (30, 30, 55, 50);
     }
   }
 </script>
@@ -77,7 +90,7 @@
   <button onclick="start();">Start</button>
   <button onclick="stop();">Stop</button>
   <br>
-  <canvas id=canvas></canvas>
+  <canvas id=canvas style="height: 300px; width: 500px;"></canvas>
   <div id=results></div>
 </body>
 </html>

@@ -23,13 +23,12 @@
 -export([handle/2]).
 -export([terminate/3]).
 
--record(state, {}).
+-record(state, {animator_pid :: pid()}).
 
 init(_, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_Type, Req, _Opts) ->
-    io:format("Websocket handler init~n"),
     Req3 = case cowboy_req:parse_header(<<"sec-websocket-protocol">>, Req) of
         {ok, undefined, Req2} ->
             Req2;
@@ -37,12 +36,13 @@ websocket_init(_Type, Req, _Opts) ->
             io:format("Subprotocols found: ~p~n", [Subprotocols]),
             Req2
     end,
-    register(animate_ws, self()),
-    {ok, Req3, #state{}}.
+    {ok, AnimatorPid} = supervisor:start_child(erl_ws_sup, [self()]),
+    io:format("Websocket handler init (~p, ~p)~n", [self(), AnimatorPid]),
+    {ok, Req3, #state{animator_pid = AnimatorPid}}.
 
 websocket_handle({text, StartStop}, Req, State) when StartStop == <<"start">>; StartStop == <<"stop">> ->
     io:format("From Websocket: {text, ~p}~n", [StartStop]),
-    animate:(list_to_atom(binary_to_list(StartStop)))(),
+    animate:(list_to_atom(binary_to_list(StartStop)))(State#state.animator_pid),
     %{ok, Req, State};
     {reply, {text, ["Erlang received command: ", StartStop]}, Req, State};
 websocket_handle({FrameType, FrameContent}, Req, State) ->
@@ -51,7 +51,7 @@ websocket_handle({FrameType, FrameContent}, Req, State) ->
     {reply, {text, ["Erlang received: ", FrameContent, " of type ", atom_to_list(FrameType)]}, Req, State}.
 
 websocket_info(ErlangMessage, Req, State) ->
-    io:format("From Erlang: ~p~n", [ErlangMessage]),
+    io:format("From Erlang (presumably from ~p): ~p~n", [State#state.animator_pid, ErlangMessage]),
     {reply, {text, ["Received from Erlang: ", ErlangMessage]}, Req, State}.
 
 handle(Req, State=#state{}) ->

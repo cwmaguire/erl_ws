@@ -16,8 +16,9 @@
 -module(animate).
 -behaviour(gen_server).
 
--export([start/0]).
--export([stop/0]).
+-export([start/1]).
+-export([stop/1]).
+-export([start_gen_server/1]).
 -export([init/1]).
 -export([handle_call/3]).
 -export([handle_cast/2]).
@@ -27,16 +28,21 @@
 
 -define(NO_ARGS, []).
 
--record(state, {running = false :: boolean()}).
+-record(state, {running = false :: boolean(),
+                animate_websocket_pid :: pid()}).
 
-start() ->
-    gen_server:cast(animate, start).
+start(Pid) ->
+    gen_server:cast(Pid, start).
 
-stop() ->
-    gen_server:cast(animate, stop).
+stop(Pid) ->
+    gen_server:cast(Pid, stop).
 
-init(?NO_ARGS) ->
-    {ok, #state{}}.
+start_gen_server(AnimateWebSocketPid) ->
+    _ok_pid = gen_server:start_link(?MODULE, AnimateWebSocketPid, _Options = []).
+
+init(AnimateWebsocketPid) ->
+    io:format("animate gen_server init (~p, ~p) ~n", [self(), AnimateWebsocketPid]),
+    {ok, #state{animate_websocket_pid = AnimateWebsocketPid}}.
 
 handle_call(Request, From, State) ->
     io:format("animate:handle_call(~p, ~p, ~p)~n", [Request, From, State]),
@@ -57,7 +63,7 @@ handle_info(animate, State = #state{running = true}) ->
     io:format("animating!~n"),
     random:seed(os:timestamp()),
     {X, Y} = {random:uniform(200), random:uniform(200)},
-    animate_ws ! ["{", integer_to_list(X), ",", integer_to_list(Y), "}"],
+    State#state.animate_websocket_pid ! ["{", integer_to_list(X), ",", integer_to_list(Y), "}"],
     timer:sleep(100),
     self() ! animate,
     {noreply, State};

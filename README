@@ -9,7 +9,7 @@ I have multiple concurrent processes sending drawing instructions through a
 Websocket to a webpage. They only draw randomly coloured squares for now.
 Next step is probably animating multiple objects.
 
-This experiment serves as a reference application showing how different
+This experiment also serves as a reference application showing how different
 Cowboy features work:
 - Form POST handling
 - Form GET handling
@@ -28,5 +28,6 @@ Cowboy features work:
 - Websocket (server handler and web page)
 
 Other features:
-- gen_server process per Websocket handler using simple_one_for_one supervisor child spec
+- gen_server process per Websocket handler using simple_one_for_one
+  supervisor child spec
 - concurrent drawing processes

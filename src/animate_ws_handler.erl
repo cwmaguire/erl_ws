@@ -34,7 +34,7 @@ parse(<<"width:", Width0/binary>>) ->
     Width = list_to_integer(binary_to_list(Width0)),
     {animate, width, [Width]};
 parse(_) ->
-    [].
+    undefined.
 
 init(_, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -47,7 +47,7 @@ websocket_init(_Type, Req, _Opts) ->
             io:format("Subprotocols found: ~p~n", [Subprotocols]),
             Req2
     end,
-    supervisor:start_child(erl_ws_sup, [self()]),
+    _ = supervisor:start_child(erl_ws_sup, [self()]),
     io:format("Websocket handler init (~p)~n", [self()]),
     {ok, Req3, #state{}}.
 
@@ -72,7 +72,7 @@ websocket_info({animator, Pid}, Req, State) ->
     io:format("Websocket handler (~p) received animator pid (~p)~n", [self(), Pid]),
     {ok, Req, State#state{animator_pid = Pid}};
 websocket_info(ErlangMessage, Req, State) ->
-    io:format("From Erlang (presumably from ~p): ~p~n", [State#state.animator_pid, ErlangMessage]),
+    %io:format("From Erlang (presumably from ~p): ~p~n", [State#state.animator_pid, ErlangMessage]),
     {reply, {text, [ErlangMessage]}, Req, State}.
 
 websocket_terminate(_Reason, _Req, _State) ->

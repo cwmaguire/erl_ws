@@ -66,7 +66,7 @@ start(_Type, _Args) ->
     %[...] in the path spec must follow a slash
 
     Dispatch = cowboy_router:compile(Routes),
-    cowboy:start_http(my_http_listener, 100, [{port, 8080}], [{env, [{dispatch, Dispatch}]}]),
+    _ = cowboy:start_http(my_http_listener, 100, [{port, 8080}], [{env, [{dispatch, Dispatch}]}]),
     erl_ws_sup:start_link().
 
 stop(_State) ->

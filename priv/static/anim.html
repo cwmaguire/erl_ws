@@ -31,7 +31,6 @@
     exampleSocket = new WebSocket("ws://localhost:8080/animate");
     exampleSocket.onopen = handle_ws_event;
     exampleSocket.onmessage = handle_ws_message;
-    //draw();
   }
 
   function handle_ws_event(event) {
@@ -42,8 +41,6 @@
 
   function handle_ws_open(){
     log("Websocket is OPEN!");
-    //exampleSocket.send("Initial data sent from webpage after opening");
-    //exampleSocket.send("height:" + canvas.height + ";width:" + canvas.width);
   };
 
   function handle_ws_message(event) {
@@ -56,8 +53,8 @@
   };
 
   function start(){
-    exampleSocket.send("height:" + canvas.clientHeight);
-    exampleSocket.send("width:" + canvas.clientWidth);
+    exampleSocket.send("height:" + (canvas.clientHeight - 50));
+    exampleSocket.send("width:" + (canvas.clientWidth - 50));
     exampleSocket.send("start");
   }
 
@@ -67,7 +64,6 @@
 
   function log(str){
     console.dir(str);
-    //results.innerHTML += "<br>" + str;
   }
 
   function draw(json) {
@@ -75,15 +71,9 @@
     var canvas = document.getElementById("canvas");
     if (canvas.getContext) {
       var ctx = canvas.getContext("2d");
-
       var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
-      log("fillStyle = " + fillStyle);
       ctx.fillStyle = fillStyle;
       ctx.fillRect (obj.x, obj.y, 50, 50);
-      //ctx.fillRect (10, 10, 55, 50);
-
-      //ctx.fillStyle = "rgba(0, 0, 200, 0.5)";
-      //ctx.fillRect (30, 30, 55, 50);
     }
   }
 </script>

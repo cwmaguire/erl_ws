@@ -32,6 +32,7 @@
 -define(NO_ARGS, []).
 
 -record(state, {running = false :: boolean(),
+                boids = [] :: list(pid()),
                 animate_websocket_pid :: pid(),
                 height :: integer(),
                 width :: integer()}).
@@ -69,10 +70,18 @@ handle_call(Request, From, State) ->
 
 handle_cast(start, State = #state{running = false}) ->
     io:format("animate:handle_cast(start, ~p)~n", [State]),
-    self() ! animate,
-    {noreply, State#state{running = true}};
-handle_cast(stop, State = #state{running = true}) ->
+    _ = random:seed(os:timestamp()),
+    %self() ! animate,
+    AnimateWebsocketPid = State#state.animate_websocket_pid,
+    Height = State#state.height,
+    Width = State#state.width,
+    RGBs = [[255,0,0], [0,255,0], [0,0,255], [100,20,200]],
+    Pids = [spawn(boid:boid(AnimateWebsocketPid, Height, Width, RGB)) || RGB <- RGBs],
+    io:format("animate started boids: ~p~n", [Pids]),
+    {noreply, State#state{running = true, boids=Pids}};
+handle_cast(stop, State = #state{running = true, boids = Boids}) ->
     io:format("animate:handle_cast(stop, ~p)~n", [State]),
+    [Boid ! stop || Boid <- Boids],
     {noreply, State#state{running = false}};
 handle_cast({height, Height}, State) ->
     io:format("animate:handle_cast({height, ~p}, ~p)~n", [Height, State]),
@@ -86,7 +95,6 @@ handle_cast(Request, State) ->
 
 handle_info(animate, State = #state{running = true, height = Height, width = Width}) ->
     io:format("animating!~n"),
-    random:seed(os:timestamp()),
     {X, Y} = {random:uniform(Height), random:uniform(Width)},
     [R, G, B] = [random:uniform(255) || _ <- lists:seq(1,3)],
     Alpha = (random:uniform(9) + 1) / 10,
@@ -101,7 +109,7 @@ handle_info(Info, State) ->
     io:format("animate:handle_info(~p, ~p)~n", [Info, State]),
     {noreply, State}.
 
-code_change(_OldVersion, _State, _Version) -> ok.
+code_change(_OldVersion, State, _Version) -> {ok, State}.
 
 terminate(_Reason, _State) ->
     ok.

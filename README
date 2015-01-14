@@ -1,14 +1,13 @@
 Erlang Cowboy Webserver Experiment
 
 I want to play with autonomous graphical elements like boids and such,
-but I don't want to do all the code in JavaScript. JavaScript is very
-interesting but also sucks. Instead I want to do all the logic in Erlang
-and connect JavaScript to Erlang via the Cowboy Erlang webserver.
+but I don't want to do all the code in JavaScript.  Instead I want to do
+all the logic in Erlang and connect JavaScript to Erlang via the Cowboy
+Erlang webserver.
 
-To date I'm simply playing with Cowboy to get a feel for all of the options.
-
-Eventually I want to set up a websocket and have JavaScript on a web page
-run all the logic asynchronously through Erlang.
+I have multiple concurrent processes sending drawing instructions through a
+Websocket to a webpage. They only draw randomly coloured squares for now.
+Next step is probably animating multiple objects.
 
 This experiment serves as a reference application showing how different
 Cowboy features work:
@@ -30,3 +29,4 @@ Cowboy features work:
 
 Other features:
 - gen_server process per Websocket handler using simple_one_for_one supervisor child spec
+- concurrent drawing processes

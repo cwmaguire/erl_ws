@@ -1,15 +1,14 @@
 Erlang Cowboy Webserver Experiment
 
-I want to play with autonomous graphical elements like boids and such,
-but I don't want to do all the code in JavaScript.  Instead I want to do
-all the logic in Erlang and connect JavaScript to Erlang via the Cowboy
-Erlang webserver.
+Multiple concurrent Erlang processes send shape objects to a web page
+through a Cowboy Websocket.
 
-I have multiple concurrent processes sending drawing instructions through a
-Websocket to a webpage. They only draw randomly coloured squares for now.
-Next step is probably animating multiple objects.
+My goal is to play with autonomous entities that move around by sending
+drawing commands to the screen and communicating to each other where they
+are. Erlang rocks at concurrency and I like the language and environment
+better than JavaScript.
 
-This experiment also serves as a reference application showing how different
+This also serves (for now) as a reference application showing how different
 Cowboy features work:
 - Form POST handling
 - Form GET handling

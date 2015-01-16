@@ -1,3 +1,3 @@
 PROJECT = erl_ws
-DEPS = cowboy
+DEPS = cowboy jsx
 include erlang.mk

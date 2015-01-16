@@ -70,12 +70,35 @@
     obj = JSON.parse(json);
     var canvas = document.getElementById("canvas");
     if (canvas.getContext) {
+      switch(obj.shape){
+        case "rectangle": drawRect(obj);
+                          break;
+        case "ellipse":   drawEllipse(obj);
+                          break;
+        default:
+                          log("Not drawing anything of shape " + obj.shape);
+      }
+    }
+  }
+
+  function drawRect(obj){
       var ctx = canvas.getContext("2d");
       var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
       ctx.fillStyle = fillStyle;
-      ctx.fillRect (obj.x, obj.y, 50, 50);
-    }
+      ctx.fillRect(obj.x, obj.y, obj.h, obj.w);
   }
+
+  function drawEllipse(obj){
+      var ctx = canvas.getContext("2d");
+      var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      ctx.fillStyle = fillStyle;
+      ctx.beginPath();
+      ctx.arc(obj.x, obj.y, obj.rad, obj.start, obj.end);
+      ctx.lineTo(obj.x, obj.y);
+      ctx.closePath();
+      ctx.fill();
+  }
+
 </script>
 <body onload="init();">
   <button onclick="start();">Start</button>

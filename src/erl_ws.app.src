@@ -7,7 +7,8 @@
 	{applications, [
 		kernel,
 		stdlib,
-    cowboy
+    cowboy,
+    jsx
 	]},
 	{mod, {erl_ws_app, []}},
 	{env, []}

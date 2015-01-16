@@ -75,13 +75,17 @@ handle_cast(start, State = #state{running = false}) ->
     AnimateWebsocketPid = State#state.animate_websocket_pid,
     Height = State#state.height,
     Width = State#state.width,
-    RGBs = [[255,0,0], [0,255,0], [0,0,255], [100,20,200]],
-    Pids = [spawn(boid:boid(AnimateWebsocketPid, Height, Width, RGB)) || RGB <- RGBs],
+    Specs = [{ellipse, [255,0,0]},
+             {ellipse, [0,255,0]},
+             {rectangle, [0,0,255]},
+             {rectangle, [100,20,200]},
+             {packman, [100,255,200]}],
+    Pids = [spawn(fun() -> boid:boid(AnimateWebsocketPid, Shape, Height, Width, RGB) end) || {Shape, RGB} <- Specs],
     io:format("animate started boids: ~p~n", [Pids]),
     {noreply, State#state{running = true, boids=Pids}};
 handle_cast(stop, State = #state{running = true, boids = Boids}) ->
     io:format("animate:handle_cast(stop, ~p)~n", [State]),
-    [Boid ! stop || Boid <- Boids],
+    _ = [Boid ! stop || Boid <- Boids],
     {noreply, State#state{running = false}};
 handle_cast({height, Height}, State) ->
     io:format("animate:handle_cast({height, ~p}, ~p)~n", [Height, State]),

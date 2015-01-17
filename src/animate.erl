@@ -73,7 +73,7 @@ handle_cast(start, State = #state{running = false}) ->
     io:format("animate:handle_cast(start, ~p)~n", [State]),
     _ = random:seed(os:timestamp()),
     AnimateWebsocketPid = State#state.animate_websocket_pid,
-    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, 200]),
+    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, 100]),
     MaxHeight = State#state.height,
     MaxWidth = State#state.width,
     %Height = 10,
@@ -103,7 +103,7 @@ handle_cast(Request, State) ->
 
 handle_info(animate, State = #state{running = true, height = Height, width = Width}) ->
     io:format("animating!~n"),
-    {X, Y} = {random:uniform(Height), random:uniform(Width)},
+    {X, Y} = {random:uniform(Width), random:uniform(Height)},
     [R, G, B] = [random:uniform(255) || _ <- lists:seq(1,3)],
     Alpha = (random:uniform(9) + 1) / 10,
     JSON = io_lib:format("{\"type\":\"square\",\"x\":~b,\"y\":~b,\"r\":~b,\"g\":~b,\"b\":~b,\"a\":~f}",

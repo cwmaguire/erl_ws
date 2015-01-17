@@ -27,7 +27,7 @@ boid(OutPid, Spec = #spec{shape = Shape,
                   rgb = RGB}) ->
 
     OutPid ! shapeJSON(Shape, X, Y, RGB, 1.0),
-    erlang:send_after(200, self(), draw),
+    erlang:send_after(100, self(), draw),
     receive
         draw ->
             NewX = (X + 5) rem Spec#spec.max_width,

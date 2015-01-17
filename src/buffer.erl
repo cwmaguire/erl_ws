@@ -10,14 +10,14 @@ start(OutPid, Wait) ->
 buffer(OutPid, Wait) ->
     receive
         send ->
-            io:format("buffer ~p sending.~n", [self()]),
+            %io:format("buffer ~p sending.~n", [self()]),
             send(OutPid),
             erlang:send_after(Wait, self(), send),
             buffer(OutPid, Wait);
         stop ->
             ets:delete(buffer);
         Value ->
-            io:format("buffer ~p receiving ~p~n", [self(), Value]),
+            %io:format("buffer ~p receiving ~p~n", [self(), Value]),
             ets:insert(buffer, {value, Value}),
             buffer(OutPid, Wait)
     end.

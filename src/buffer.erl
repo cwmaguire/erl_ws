@@ -27,8 +27,10 @@ send(OutPid) ->
         [] ->
             ok;
         Recs ->
-            [[_, FirstValue] | Values] = [[<<$,>>, Value] || {_, Value} <- Recs],
-            WrappedValues = [$[, FirstValue, Values, $]],
+            %[[_, FirstValue] | Values] = [[<<$,>>, Value] || {_, Value} <- Recs],
+            Values = [Value || {_, Value} <- Recs],
+            JSON = jsx:encode([{canvas, <<"boids">>}, {objs, Values}]),
             ets:delete_all_objects(buffer),
-            OutPid ! WrappedValues
+            %io:format("Sending boids: ~p~n", [JSON]),
+            OutPid ! JSON
     end.

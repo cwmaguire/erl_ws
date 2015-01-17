@@ -8,6 +8,10 @@ drawing commands to the screen and communicating to each other where they
 are. Erlang rocks at concurrency and I like the language and environment
 better than JavaScript.
 
+I've added a heat map that tracks the boids. I'm planning on having the
+boids (autonomous entities) react to the heat map when determining where
+to go next.
+
 This also serves (for now) as a reference application showing how different
 Cowboy features work:
 - Form POST handling

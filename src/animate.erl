@@ -30,11 +30,13 @@
 -export([terminate/2]).
 
 -define(NO_ARGS, []).
+-define(BUFFER_WAIT, 1000).
 
 -record(state, {running = false :: boolean(),
                 boids = [] :: list(pid()),
                 animate_websocket_pid :: pid(),
                 buffer_pid :: pid(),
+                heatmap_pid :: pid(),
                 height :: integer(),
                 width :: integer()}).
 
@@ -73,6 +75,8 @@ handle_cast(start, State = #state{running = false}) ->
     io:format("animate:handle_cast(start, ~p)~n", [State]),
     _ = random:seed(os:timestamp()),
     AnimateWebsocketPid = State#state.animate_websocket_pid,
+    HeatMapPid = heatmap:start(),
+    self() ! render_heatmap,
     BufferPid = spawn(buffer, start, [AnimateWebsocketPid, 100]),
     MaxHeight = State#state.height,
     MaxWidth = State#state.width,
@@ -83,11 +87,21 @@ handle_cast(start, State = #state{running = false}) ->
              {rectangle, [0,0,255]},
              {rectangle, [100,20,200]},
              {packman, [100,255,200]}],
-    Pids = [spawn(fun() -> boid:boid(BufferPid, boid:spec(Shape, MaxHeight, MaxWidth, RGB)) end) || {Shape, RGB} <- Specs],
+
+    Pids = [spawn(fun() -> boid:start(boid:state(BufferPid, HeatMapPid, Shape, MaxHeight, MaxWidth, RGB))
+                  end) || {Shape, RGB} <- Specs],
+
     io:format("animate started boids: ~p~n", [Pids]),
-    {noreply, State#state{running = true, boids=Pids, buffer_pid = BufferPid}};
-handle_cast(stop, State = #state{running = true, boids = Boids, buffer_pid = BufferPid}) ->
+    {noreply, State#state{running = true,
+                          boids=Pids,
+                          buffer_pid = BufferPid,
+                          heatmap_pid = HeatMapPid}};
+handle_cast(stop, State = #state{running = true,
+                                 boids = Boids,
+                                 buffer_pid = BufferPid,
+                                 heatmap_pid = HeatMapPid}) ->
     io:format("animate:handle_cast(stop, ~p)~n", [State]),
+    heatmap:stop(HeatMapPid),
     _ = [Boid ! stop || Boid <- Boids],
     BufferPid ! stop,
     {noreply, State#state{running = false}};
@@ -101,6 +115,13 @@ handle_cast(Request, State) ->
     io:format("animate:handle_cast(~p, ~p)~n", [Request, State]),
     {noreply, State}.
 
+handle_info(render_heatmap, State = #state{heatmap_pid = HeatmapPid}) ->
+    Heatmap = heatmap:render(HeatmapPid),
+    JSON = jsx:encode(Heatmap),
+    %io:format("Sending heatmap:~n~p~n", [JSON]),
+    State#state.animate_websocket_pid ! JSON,
+    erlang:send_after(1000, self(), render_heatmap),
+    {noreply, State};
 handle_info(animate, State = #state{running = true, height = Height, width = Width}) ->
     io:format("animating!~n"),
     {X, Y} = {random:uniform(Width), random:uniform(Height)},

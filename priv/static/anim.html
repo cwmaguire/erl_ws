@@ -22,12 +22,14 @@
 <script language="JavaScript">
   var exampleSocket;
   var results;
-  var canvas;
+  var boids;
+  var heatmap;
 
   function init(){
     log("init");
     results = document.getElementById("results");
-    canvas = document.getElementById("canvas");
+    boids = document.getElementById("boids");
+    heatmap = document.getElementById("heatmap");
     exampleSocket = new WebSocket("ws://localhost:8080/animate");
     exampleSocket.onopen = handle_ws_event;
     exampleSocket.onmessage = handle_ws_message;
@@ -45,16 +47,16 @@
 
   function handle_ws_message(event) {
     //log("Data from Websocket: " + event.data);
-    if(event.data.substring(0,1) == "["){
+    if(event.data.substring(0,1) == "{"){
       draw(event.data);
     }else{
-      log("" + event.data.substring(0,1) + " does not equal '['");
+      log("First character of event, " + event.data.substring(0,1) + ", does not equal '{'");
     }
   };
 
   function start(){
-    exampleSocket.send("height:" + canvas.clientHeight);
-    exampleSocket.send("width:" + canvas.clientWidth);
+    exampleSocket.send("height:" + boids.clientHeight);
+    exampleSocket.send("width:" + boids.clientWidth);
     exampleSocket.send("start");
   }
 
@@ -67,12 +69,13 @@
   }
 
   function draw(json) {
-    objs = JSON.parse(json);
-    var canvas = document.getElementById("canvas");
+    obj = JSON.parse(json);
+    //log(obj);
+    var canvas = document.getElementById(obj.canvas);
     if (canvas.getContext) {
       ctx = canvas.getContext("2d");
       blankCanvas(ctx, canvas);
-      objs.forEach(function(obj){
+      obj.objs.forEach(function(obj){
         //log("drawing obj");
         switch(obj.shape){
           case "rectangle": drawRect(ctx, obj);
@@ -114,7 +117,8 @@
   <button onclick="start();">Start</button>
   <button onclick="stop();">Stop</button>
   <br>
-  <canvas id=canvas height=300 width=500 style="border: 1px solid black;"></canvas>
+  <canvas id=boids height=300 width=300 style="border: 1px solid black;"></canvas>
+  <canvas id=heatmap height=300 width=300 style="border: 1px solid black;"></canvas>
   <div id=results></div>
 </body>
 </html>

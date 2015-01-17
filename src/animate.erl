@@ -34,6 +34,7 @@
 -record(state, {running = false :: boolean(),
                 boids = [] :: list(pid()),
                 animate_websocket_pid :: pid(),
+                buffer_pid :: pid(),
                 height :: integer(),
                 width :: integer()}).
 
@@ -71,21 +72,24 @@ handle_call(Request, From, State) ->
 handle_cast(start, State = #state{running = false}) ->
     io:format("animate:handle_cast(start, ~p)~n", [State]),
     _ = random:seed(os:timestamp()),
-    %self() ! animate,
     AnimateWebsocketPid = State#state.animate_websocket_pid,
-    Height = State#state.height,
-    Width = State#state.width,
+    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, 200]),
+    MaxHeight = State#state.height,
+    MaxWidth = State#state.width,
+    %Height = 10,
+    %Width = 10,
     Specs = [{ellipse, [255,0,0]},
              {ellipse, [0,255,0]},
              {rectangle, [0,0,255]},
              {rectangle, [100,20,200]},
              {packman, [100,255,200]}],
-    Pids = [spawn(fun() -> boid:boid(AnimateWebsocketPid, Shape, Height, Width, RGB) end) || {Shape, RGB} <- Specs],
+    Pids = [spawn(fun() -> boid:boid(BufferPid, boid:spec(Shape, MaxHeight, MaxWidth, RGB)) end) || {Shape, RGB} <- Specs],
     io:format("animate started boids: ~p~n", [Pids]),
-    {noreply, State#state{running = true, boids=Pids}};
-handle_cast(stop, State = #state{running = true, boids = Boids}) ->
+    {noreply, State#state{running = true, boids=Pids, buffer_pid = BufferPid}};
+handle_cast(stop, State = #state{running = true, boids = Boids, buffer_pid = BufferPid}) ->
     io:format("animate:handle_cast(stop, ~p)~n", [State]),
     _ = [Boid ! stop || Boid <- Boids],
+    BufferPid ! stop,
     {noreply, State#state{running = false}};
 handle_cast({height, Height}, State) ->
     io:format("animate:handle_cast({height, ~p}, ~p)~n", [Height, State]),

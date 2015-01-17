@@ -45,10 +45,10 @@
 
   function handle_ws_message(event) {
     log("Data from Websocket: " + event.data);
-    if(event.data.substring(0,1) == "{"){
+    if(event.data.substring(0,1) == "["){
       draw(event.data);
     }else{
-      log("" + event.data.substring(0,1) + " does not equal '{'");
+      log("" + event.data.substring(0,1) + " does not equal '['");
     }
   };
 
@@ -67,29 +67,39 @@
   }
 
   function draw(json) {
-    obj = JSON.parse(json);
+    objs = JSON.parse(json);
     var canvas = document.getElementById("canvas");
     if (canvas.getContext) {
-      switch(obj.shape){
-        case "rectangle": drawRect(obj);
-                          break;
-        case "ellipse":   drawEllipse(obj);
-                          break;
-        default:
-                          log("Not drawing anything of shape " + obj.shape);
-      }
+      ctx = canvas.getContext("2d");
+      blankCanvas(ctx, canvas);
+      objs.forEach(function(obj){
+        log("drawing obj");
+        switch(obj.shape){
+          case "rectangle": drawRect(ctx, obj);
+                            break;
+          case "ellipse":   drawEllipse(ctx, obj);
+                            break;
+          default:
+                            log("Not drawing anything of shape " + obj.shape);
+        };
+      });
     }
   }
 
-  function drawRect(obj){
-      var ctx = canvas.getContext("2d");
+  function blankCanvas(ctx, canvas){
+      drawRect(ctx,
+               {x: 0, y: 0,
+                h: canvas.clientHeight, w: canvas.clientWidth,
+                r: 255, g: 255, b: 255, a: 1.0});
+  }
+
+  function drawRect(ctx, obj){
       var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
       ctx.fillStyle = fillStyle;
       ctx.fillRect(obj.x, obj.y, obj.h, obj.w);
   }
 
-  function drawEllipse(obj){
-      var ctx = canvas.getContext("2d");
+  function drawEllipse(ctx, obj){
       var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
       ctx.fillStyle = fillStyle;
       ctx.beginPath();

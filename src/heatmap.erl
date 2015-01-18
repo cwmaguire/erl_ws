@@ -58,16 +58,12 @@ update(UpdateFunFun, {X, Y}, State = #state{cells = Cells}) ->
 
 update_square(MaxMinXY, Acc = {UpdateFunFun, Amt, _Cells}) ->
     SquareCells = square(MaxMinXY),
-    %io:format("update_square(~p, ...) with SquareCells:~n\t~p~n",
-              %[MaxMinXY, SquareCells]),
     {_, _, NewCells} = lists:foldl(fun update_cell/2, Acc, SquareCells),
     {UpdateFunFun, Amt - ?FALLOFF, NewCells}.
 
 square({X1, Y1, X2, Y2}) ->
-    %io:format("square({~p, ~p, ~p, ~p})~n", [X1, Y1, X2, Y2]),
     Xs = lists:seq(X1, X2),
     Ys = lists:seq(Y1, Y2),
-    %io:format("square: Xs = ~w, Ys = ~w~n", [Xs, Ys]),
     [{X, Y} || X <- Xs, Y <- Ys, X == X1 orelse X == X2 orelse Y == Y1 orelse Y == Y2].
 
 update_cell({X, Y}, {UpdateFunFun, Amt, Cells}) ->
@@ -81,7 +77,6 @@ rem_fun(Amt) ->
 
 render_cells(Cells) ->
     RenderedCells = dict:fold(fun render_cell/3, [], Cells),
-    %io:format("heatmap:render_cell(...) returned:~n\t~p~n", [RenderedCells]),
     [{canvas, <<"heatmap">>}, {objs, RenderedCells}].
 
 render_cell({X, Y}, Amt, Objects) ->
@@ -89,14 +84,19 @@ render_cell({X, Y}, Amt, Objects) ->
     Cell = shape:shape(rectangle, {X * 10, Y * 10}, 10, {Red, 0, 0, 1.0}),
     [Cell | Objects].
 
+heat_({X, Y}, Cells) ->
+    SurroundingPoints = [{X2, Y2} || X2 <- [X - 1, X, X + 1], Y2 <- [Y - 1, Y, Y + 1], {X2, Y2} /= {X, Y}],
+    io:format("heatmap:heat_({~p, ~p}, Cells);~n\tSurroundingPoints = ~p~n", [X, Y, SurroundingPoints]),
+    [{{X2 - X, Y2 - Y}, Amt} || {X2, Y2} <- SurroundingPoints, {ok, Amt} <- [dict:find({X2, Y2}, Cells)]].
+
 %% gen_server
 
 init({}) ->
     io:format("heatmap gen_server init (~p) ~n", [self()]),
     {ok, #state{cells = dict:new()}}.
 
-handle_call({heat, XY}, _From, State) ->
-    {reply, dict:fetch(XY, State#state.cells), State};
+handle_call({heat, {X, Y}}, _From, State = #state{cells = Cells}) ->
+    {reply, heat_({X, Y}, Cells), State};
 handle_call(map, _From, State) ->
     {reply, State#state.cells, State};
 handle_call(render, _From, State = #state{cells = Cells}) ->
@@ -108,10 +108,8 @@ handle_call(Request, From, State) ->
 handle_cast(stop, State) ->
     {stop, normal, State};
 handle_cast({To}, State) ->
-    io:format("heatmap:handle_cast({~p}, State)~n", [To]),
     {noreply, update(fun add_fun/1, To, State)};
 handle_cast({From, To}, State) ->
-    io:format("heatmap:handle_cast({~p, ~p}, State)~n", [From, To]),
     {noreply, update(fun add_fun/1, To, update(fun rem_fun/1, From, State))}.
 
 handle_info(Info, State) ->

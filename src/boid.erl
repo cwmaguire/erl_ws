@@ -45,8 +45,10 @@ boid(State = #state{buffer_pid = BufferPid,
     erlang:send_after(?CYCLE_TIME, self(), draw),
     receive
         draw ->
-            NewX = (OldX + 5) rem State#state.max_width,
-            NewY = (OldY + 5) rem State#state.max_height,
+            {NewX, NewY} = next_point(OldX, OldY, HeatMapPid, State),
+
+            %NewX = (OldX + 5) rem State#state.max_width,
+            %NewY = (OldY + 5) rem State#state.max_height,
             heatmap:move(HeatMapPid,
                          point2grid({OldX, OldY}, ?BOID_SIZE),
                          point2grid({NewX, NewY}, ?BOID_SIZE)),
@@ -57,6 +59,36 @@ boid(State = #state{buffer_pid = BufferPid,
     after 5000 ->
         io:format("boid ~p didn't receive anything~n", [self()]),
         ok
+    end.
+
+next_point(OldX, OldY, HeatMapPid, State) ->
+    Heat = heatmap:heat(HeatMapPid, point2grid({OldX, OldY}, ?BOID_SIZE)),
+    io:format("boid:next_point(~p, ~p, HeatMapPid, State);~n\tHeat = ~p~n",
+              [OldX, OldY, Heat]),
+    SortedHeat = lists:sort(fun({_, H1}, {_, H2}) -> H1 > H2 end, Heat),
+    %io:format("boid:next_point(~p, ~p, HeatMapPid, State);~n\tSortedHeat = ~p~n",
+              %[OldX, OldY, SortedHeat]),
+    {XMultiple, YMultiple} = xy_multiples(SortedHeat),
+    %io:format("boid:next_point(~p, ~p, HeatMapPid, State);~n\tXY Multiples = ~p~n",
+              %[OldX, OldY, {XMultiple, YMultiple}]),
+    NewX = (OldX + (XMultiple * 3)) rem State#state.max_width,
+    NewY = (OldY + (YMultiple * 3)) rem State#state.max_height,
+    {NewX, NewY}.
+
+xy_multiples([]) ->
+    Multipliers = [{X2, Y2} || X2 <- [-1, 0, 1], Y2 <- [-1, 0, 1], {X2, Y2} /= {0, 0}],
+    lists:nth(random:uniform(8), Multipliers);
+xy_multiples(XYHeat) ->
+    case [XYH || XYH = {_, H} <- XYHeat, H =< 60] of
+        [] ->
+            element(1, hd(lists:reverse(XYHeat)));
+        [{X, Y}, _] ->
+            {X, Y};
+        [{_, MaxValid} | _] = ValidHeat ->
+            %io:format("boid:xy_multiples(...);~n\tValidHeat = ~p~n", [ValidHeat]),
+            BestHeat = lists:filter(fun({_, H}) -> H == MaxValid end, ValidHeat),
+            io:format("boid:xy_multiples(...);~n\tBestHeat = ~p~n", [BestHeat]),
+            element(1,lists:nth(random:uniform(length(BestHeat)), BestHeat))
     end.
 
 %point2grid(Point, #state{max_width = MaxW, max_height = MaxH}) ->

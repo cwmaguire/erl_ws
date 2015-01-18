@@ -84,8 +84,14 @@ handle_cast(start, State = #state{running = false}) ->
     %Width = 10,
     Specs = [{ellipse, [255,0,0]},
              {ellipse, [0,255,0]},
+             {ellipse, [255,255,0]},
+             {ellipse, [0,255,255]},
+             {ellipse, [100,200,100]},
              {rectangle, [0,0,255]},
              {rectangle, [100,20,200]},
+             {rectangle, [30,90,200]},
+             {rectangle, [30,90,200]},
+             {rectangle, [30,90,200]},
              {packman, [100,255,200]}],
 
     Pids = [spawn(fun() -> boid:start(boid:state(BufferPid, HeatMapPid, Shape, MaxHeight, MaxWidth, RGB))

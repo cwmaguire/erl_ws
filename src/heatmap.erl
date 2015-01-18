@@ -19,7 +19,7 @@
 -record(state, {cells :: dict()}).
 
 -define(CYCLE_TIME, 1000).
--define(RANGE, 4).
+-define(RANGE, 6).
 -define(FALLOFF, 30).
 
 %% API

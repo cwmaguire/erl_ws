@@ -30,7 +30,8 @@
 -export([terminate/2]).
 
 -define(NO_ARGS, []).
--define(BUFFER_WAIT, 1000).
+-define(BUFFER_CYCLE, 50).
+-define(HEATMAP_CYCLE, 50).
 
 -record(state, {running = false :: boolean(),
                 boids = [] :: list(pid()),
@@ -77,7 +78,7 @@ handle_cast(start, State = #state{running = false}) ->
     AnimateWebsocketPid = State#state.animate_websocket_pid,
     HeatMapPid = heatmap:start(),
     self() ! render_heatmap,
-    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, 100]),
+    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, ?BUFFER_CYCLE]),
     MaxHeight = State#state.height,
     MaxWidth = State#state.width,
     %Height = 10,
@@ -112,10 +113,8 @@ handle_cast(stop, State = #state{running = true,
     BufferPid ! stop,
     {noreply, State#state{running = false}};
 handle_cast({height, Height}, State) ->
-    io:format("animate:handle_cast({height, ~p}, ~p)~n", [Height, State]),
     {noreply, State#state{height = Height}};
 handle_cast({width, Width}, State) ->
-    io:format("animate:handle_cast({width, ~p}, ~p)~n", [Width, State]),
     {noreply, State#state{width = Width}};
 handle_cast(Request, State) ->
     io:format("animate:handle_cast(~p, ~p)~n", [Request, State]),
@@ -124,21 +123,8 @@ handle_cast(Request, State) ->
 handle_info(render_heatmap, State = #state{heatmap_pid = HeatmapPid}) ->
     Heatmap = heatmap:render(HeatmapPid),
     JSON = jsx:encode(Heatmap),
-    %io:format("Sending heatmap:~n~p~n", [JSON]),
     State#state.animate_websocket_pid ! JSON,
-    erlang:send_after(1000, self(), render_heatmap),
-    {noreply, State};
-handle_info(animate, State = #state{running = true, height = Height, width = Width}) ->
-    io:format("animating!~n"),
-    {X, Y} = {random:uniform(Width), random:uniform(Height)},
-    [R, G, B] = [random:uniform(255) || _ <- lists:seq(1,3)],
-    Alpha = (random:uniform(9) + 1) / 10,
-    JSON = io_lib:format("{\"type\":\"square\",\"x\":~b,\"y\":~b,\"r\":~b,\"g\":~b,\"b\":~b,\"a\":~f}",
-                         [X, Y, R, G, B, Alpha]),
-    State#state.animate_websocket_pid ! JSON,
-    %State#state.animate_websocket_pid ! ["{", integer_to_list(X), ",", integer_to_list(Y), "}"],
-    timer:sleep(100),
-    self() ! animate,
+    erlang:send_after(?HEATMAP_CYCLE, self(), render_heatmap),
     {noreply, State};
 handle_info(Info, State) ->
     io:format("animate:handle_info(~p, ~p)~n", [Info, State]),

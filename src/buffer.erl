@@ -3,34 +3,22 @@
 -export([start/2]).
 
 start(OutPid, Wait) ->
-    ets:new(buffer, [public, named_table, duplicate_bag]),
     erlang:send_after(Wait, self(), send),
-    buffer(OutPid, Wait).
+    buffer(OutPid, Wait, dict:new()).
 
-buffer(OutPid, Wait) ->
+buffer(OutPid, Wait, Buffer) ->
     receive
         send ->
-            %io:format("buffer ~p sending.~n", [self()]),
-            send(OutPid),
+            send(OutPid, Buffer),
             erlang:send_after(Wait, self(), send),
-            buffer(OutPid, Wait);
+            buffer(OutPid, Wait, Buffer);
         stop ->
-            ets:delete(buffer);
-        Value ->
-            %io:format("buffer ~p receiving ~p~n", [self(), Value]),
-            ets:insert(buffer, {value, Value}),
-            buffer(OutPid, Wait)
+            ok;
+        {Pid, Value} ->
+            buffer(OutPid, Wait, dict:update(Pid, fun(_) -> Value end, Value, Buffer))
     end.
 
-send(OutPid) ->
-    case ets:tab2list(buffer) of
-        [] ->
-            ok;
-        Recs ->
-            %[[_, FirstValue] | Values] = [[<<$,>>, Value] || {_, Value} <- Recs],
-            Values = [Value || {_, Value} <- Recs],
-            JSON = jsx:encode([{canvas, <<"boids">>}, {objs, Values}]),
-            ets:delete_all_objects(buffer),
-            %io:format("Sending boids: ~p~n", [JSON]),
-            OutPid ! JSON
-    end.
+send(OutPid, Buffer) ->
+    Values = [Value || {_, Value} <- dict:to_list(Buffer)],
+    JSON = jsx:encode([{canvas, <<"boids">>}, {objs, Values}]),
+    OutPid ! JSON.

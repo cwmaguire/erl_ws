@@ -13,7 +13,7 @@
                 x :: integer(),
                 y :: integer()}).
 
--define(CYCLE_TIME, 1000).
+-define(CYCLE_TIME, 50).
 -define(BOID_SIZE, 10).
 
 state(BufferPid, HeatMapPid, Shape, MaxHeight, MaxWidth, MaxRGB) ->
@@ -40,7 +40,7 @@ boid(State = #state{buffer_pid = BufferPid,
                     y = OldY,
                     rgba = RGBA}) ->
 
-    BufferPid ! shape:shape(Shape, {OldX, OldY}, ?BOID_SIZE, RGBA),
+    BufferPid ! {self(), shape:shape(Shape, {OldX, OldY}, ?BOID_SIZE, RGBA)},
     erlang:send_after(?CYCLE_TIME, self(), draw),
     receive
         draw ->

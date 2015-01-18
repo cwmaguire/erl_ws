@@ -18,7 +18,7 @@
 
 -record(state, {cells :: dict()}).
 
--define(CYCLE_TIME, 1000).
+-define(CYCLE_TIME, 50).
 -define(RANGE, 6).
 -define(FALLOFF, 30).
 
@@ -86,13 +86,11 @@ render_cell({X, Y}, Amt, Objects) ->
 
 heat_({X, Y}, Cells) ->
     SurroundingPoints = [{X2, Y2} || X2 <- [X - 1, X, X + 1], Y2 <- [Y - 1, Y, Y + 1], {X2, Y2} /= {X, Y}],
-    io:format("heatmap:heat_({~p, ~p}, Cells);~n\tSurroundingPoints = ~p~n", [X, Y, SurroundingPoints]),
     [{{X2 - X, Y2 - Y}, Amt} || {X2, Y2} <- SurroundingPoints, {ok, Amt} <- [dict:find({X2, Y2}, Cells)]].
 
 %% gen_server
 
 init({}) ->
-    io:format("heatmap gen_server init (~p) ~n", [self()]),
     {ok, #state{cells = dict:new()}}.
 
 handle_call({heat, {X, Y}}, _From, State = #state{cells = Cells}) ->

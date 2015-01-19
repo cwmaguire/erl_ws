@@ -1,19 +1,25 @@
 Erlang Cowboy Webserver Experiment
 
 Multiple concurrent Erlang processes send shape objects to a web page
-through a Cowboy Websocket.
+through a Cowboy Websocket. The processes use a heat map to track where they
+and other processes are currently drawing themselves. Currently the algorithm
+is complete crap: all the boids go vibrate in a corner and vacillate between
+moving towards and away from the heat. I need to add in some other influence
+to get the boids to move around; maybe get them to chase something or just
+add in some random "personality"; or some pacman-like personalities.
 
-My goal is to play with autonomous entities that move around by sending
-drawing commands to the screen and communicating to each other where they
-are. Erlang rocks at concurrency and I like the language and environment
-better than JavaScript.
+When I started this I went through the Cowboy user's guide and implemented
+a bunch of features. I've left these features implemented for now but I'll
+probably move them to their own repo as the "boids" portion of this app grows.
 
-I've added a heat map that tracks the boids. I'm planning on having the
-boids (autonomous entities) react to the heat map when determining where
-to go next.
+Features:
+- gen_server process per Websocket handler using simple_one_for_one
+  supervisor child spec
+- concurrent drawing processes
+- Server graphic object buffering
+- Process influence "heat map"
 
-This also serves (for now) as a reference application showing how different
-Cowboy features work:
+Implemented Cowboy features for reference:
 - Form POST handling
 - Form GET handling
 - Reading request body
@@ -29,8 +35,3 @@ Cowboy features work:
 - Reading request body in chunks
 - Sending response in chunks
 - Websocket (server handler and web page)
-
-Other features:
-- gen_server process per Websocket handler using simple_one_for_one
-  supervisor child spec
-- concurrent drawing processes

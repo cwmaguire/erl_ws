@@ -81,7 +81,7 @@ render_cells(Cells) ->
 
 render_cell({X, Y}, Amt, Objects) ->
     Red = 255 - Amt,
-    Cell = shape:shape(rectangle, {X * 10, Y * 10}, 10, {Red, 0, 0, 1.0}),
+    Cell = shape:shape(rectangle, {X * 10, Y * 10}, 10, {Red, 0, 0, 1.0}, gradient, {Red + ?FALLOFF, 0, 0, 1.0}),
     [Cell | Objects].
 
 heat_({X, Y}, Cells) ->

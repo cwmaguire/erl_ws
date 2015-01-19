@@ -93,17 +93,39 @@
       drawRect(ctx,
                {x: 0, y: 0,
                 h: canvas.height, w: canvas.width,
-                r: 255, g: 255, b: 255, a: 1.0});
+                r: 255, g: 255, b: 255, a: 1.0,
+                fill: "color"});
   }
 
   function drawRect(ctx, obj){
-      var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      var fillStyle;
+      if(obj.fill == "gradient"){
+        obj.x += 5;
+        obj.y += 5;
+        var gradientX = obj.x + (obj.w / 2);
+        var gradientY = obj.y + (obj.w / 2);
+        gradient = ctx.createRadialGradient(gradientX, gradientY, obj.w, gradientX, gradientY, 0);
+        gradient.addColorStop(0,"rgba(" + obj.gr + "," + obj.gg + "," + obj.gb + ", " + obj.ga + ")");
+        gradient.addColorStop(1,"rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")");
+        fillStyle = gradient;
+      }else{
+        log("fill style is " + obj.fill);
+        fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      }
       ctx.fillStyle = fillStyle;
       ctx.fillRect(obj.x, obj.y, obj.w, obj.h);
   }
 
   function drawEllipse(ctx, obj){
-      var fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      var fillStyle;
+      if(obj.fill == "gradient"){
+        gradient = ctx.createRadialGradient(obj.x, obj.y, obj.rad, obj.x, obj.y, 0);
+        gradient.addColorStop(0,"rgba(" + obj.gr + "," + obj.gg + "," + obj.gb + ", " + obj.ga + ")");
+        gradient.addColorStop(1,"rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")");
+        fillStyle = gradient;
+      }else{
+        fillStyle = "rgba(" + obj.r + "," + obj.g + "," + obj.b + ", " + obj.a + ")";
+      }
       ctx.fillStyle = fillStyle;
       ctx.beginPath();
       ctx.arc(obj.x, obj.y, obj.rad, obj.start, obj.end);

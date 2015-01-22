@@ -2,11 +2,9 @@ Erlang Cowboy Webserver Experiment
 
 Multiple concurrent Erlang processes send shape objects to a web page
 through a Cowboy Websocket. The processes use a heat map to track where they
-and other processes are currently drawing themselves. Currently the algorithm
-is complete crap: all the boids go vibrate in a corner and vacillate between
-moving towards and away from the heat. I need to add in some other influence
-to get the boids to move around; maybe get them to chase something or just
-add in some random "personality"; or some pacman-like personalities.
+and other processes are currently drawing themselves. The heat map dissapates
+over time to encourage the processes not to try and go backwards. Unfortunately
+this allows them to get trapped in corners by other processes. Needs tuning.
 
 When I started this I went through the Cowboy user's guide and implemented
 a bunch of features. I've left these features implemented for now but I'll

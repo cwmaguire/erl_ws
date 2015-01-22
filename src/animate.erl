@@ -30,8 +30,6 @@
 -export([terminate/2]).
 
 -define(NO_ARGS, []).
--define(BUFFER_CYCLE, 50).
--define(HEATMAP_CYCLE, 50).
 
 -record(state, {running = false :: boolean(),
                 boids = [] :: list(pid()),
@@ -78,11 +76,9 @@ handle_cast(start, State = #state{running = false}) ->
     AnimateWebsocketPid = State#state.animate_websocket_pid,
     HeatMapPid = heatmap:start(),
     self() ! render_heatmap,
-    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, ?BUFFER_CYCLE]),
+    BufferPid = spawn(buffer, start, [AnimateWebsocketPid, cycle_time()]),
     MaxHeight = State#state.height,
     MaxWidth = State#state.width,
-    %Height = 10,
-    %Width = 10,
     Specs = [{ellipse, [255,0,0]},
              {ellipse, [0,255,0]},
              {ellipse, [255,255,0]},
@@ -124,7 +120,7 @@ handle_info(render_heatmap, State = #state{heatmap_pid = HeatmapPid}) ->
     Heatmap = heatmap:render(HeatmapPid),
     JSON = jsx:encode(Heatmap),
     State#state.animate_websocket_pid ! JSON,
-    erlang:send_after(?HEATMAP_CYCLE, self(), render_heatmap),
+    erlang:send_after(cycle_time(), self(), render_heatmap),
     {noreply, State};
 handle_info(Info, State) ->
     io:format("animate:handle_info(~p, ~p)~n", [Info, State]),
@@ -134,3 +130,7 @@ code_change(_OldVersion, State, _Version) -> {ok, State}.
 
 terminate(_Reason, _State) ->
     ok.
+
+cycle_time() ->
+    {ok, CycleTime} = application:get_env(erl_ws, cycle_time),
+    CycleTime.

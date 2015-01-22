@@ -26,7 +26,6 @@
                 x :: integer(),
                 y :: integer()}).
 
--define(CYCLE_TIME, 50).
 -define(BOID_SIZE, 10).
 
 state(BufferPid, HeatMapPid, Shape, MaxHeight, MaxWidth, MaxRGB) ->
@@ -54,13 +53,11 @@ boid(State = #state{buffer_pid = BufferPid,
                     rgba = RGBA}) ->
 
     BufferPid ! {self(), shape:shape(Shape, {OldX, OldY}, ?BOID_SIZE, RGBA)},
-    erlang:send_after(?CYCLE_TIME, self(), draw),
+    erlang:send_after(cycle_time(), self(), draw),
     receive
         draw ->
             {NewX, NewY} = next_point(OldX, OldY, HeatMapPid, State),
 
-            %NewX = (OldX + 5) rem State#state.max_width,
-            %NewY = (OldY + 5) rem State#state.max_height,
             heatmap:move(HeatMapPid,
                          point2grid({OldX, OldY}, ?BOID_SIZE),
                          point2grid({NewX, NewY}, ?BOID_SIZE)),
@@ -98,7 +95,6 @@ xy_multiples(XYHeat) ->
             {X, Y};
         [{_, MaxValid} | _] = ValidHeat ->
             BestHeat = lists:filter(fun({_, H}) -> H == MaxValid end, ValidHeat),
-            io:format("boid:xy_multiples(...);~n\tBestHeat = ~p~n", [BestHeat]),
             element(1,lists:nth(random:uniform(length(BestHeat)), BestHeat))
     end.
 
@@ -117,3 +113,7 @@ rand_color_elem(0) ->
     0;
 rand_color_elem(X) ->
     random:uniform(X).
+
+cycle_time() ->
+    {ok, CycleTime} = application:get_env(erl_ws, cycle_time),
+    CycleTime.

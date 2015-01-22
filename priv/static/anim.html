@@ -46,7 +46,6 @@
   };
 
   function handle_ws_message(event) {
-    //log("Data from Websocket: " + event.data);
     if(event.data.substring(0,1) == "{"){
       draw(event.data);
     }else{
@@ -70,13 +69,11 @@
 
   function draw(json) {
     obj = JSON.parse(json);
-    //log(obj);
     var canvas = document.getElementById(obj.canvas);
     if (canvas.getContext) {
       ctx = canvas.getContext("2d");
       blankCanvas(ctx, canvas);
       obj.objs.forEach(function(obj){
-        //log("drawing obj");
         switch(obj.shape){
           case "rectangle": drawRect(ctx, obj);
                             break;
@@ -139,8 +136,8 @@
   <button onclick="start();">Start</button>
   <button onclick="stop();">Stop</button>
   <br>
-  <canvas id=boids height=300 width=300 style="border: 1px solid black;"></canvas>
-  <canvas id=heatmap height=300 width=300 style="border: 1px solid black;"></canvas>
+  <canvas id=boids height=600 width=500 style="border: 1px solid black;"></canvas>
+  <canvas id=heatmap height=600 width=500 style="border: 1px solid black;"></canvas>
   <div id=results></div>
 </body>
 </html>

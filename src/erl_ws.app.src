@@ -11,5 +11,5 @@
     jsx
 	]},
 	{mod, {erl_ws_app, []}},
-	{env, []}
+	{env, [{cycle_time, 50}]}
 ]}.

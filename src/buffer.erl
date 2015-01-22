@@ -22,7 +22,7 @@ start(OutPid, Wait) ->
 buffer(OutPid, Wait, Buffer) ->
     receive
         send ->
-            send(OutPid, Buffer),
+            _ = send(OutPid, Buffer),
             erlang:send_after(Wait, self(), send),
             buffer(OutPid, Wait, Buffer);
         stop ->

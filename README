@@ -1,23 +1,9 @@
 Erlang Cowboy Webserver Experiment
 
-Multiple concurrent Erlang processes send shape objects to a web page
-through a Cowboy Websocket. The processes use a heat map to track where they
-and other processes are currently drawing themselves. The heat map dissapates
-over time to encourage the processes not to try and go backwards. Unfortunately
-this allows them to get trapped in corners by other processes. Needs tuning.
+In order to build a Erlang application that would talk to a
+websocket I first when through the Cowboy user guide and
+implemented a bunch of cowboy features for reference:
 
-When I started this I went through the Cowboy user's guide and implemented
-a bunch of features. I've left these features implemented for now but I'll
-probably move them to their own repo as the "boids" portion of this app grows.
-
-Features:
-- gen_server process per Websocket handler using simple_one_for_one
-  supervisor child spec
-- concurrent drawing processes
-- Server graphic object buffering
-- Process influence "heat map"
-
-Implemented Cowboy features for reference:
 - Form POST handling
 - Form GET handling
 - Reading request body

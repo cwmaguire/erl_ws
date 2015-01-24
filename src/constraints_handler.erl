@@ -32,10 +32,10 @@ init(_, Req, _Opts = {constraints_met, AreConstraintsMet}) ->
 
 handle(Req, State = #state{are_constraints_met = AreConstraintsMet}) ->
     {Anything, Req2} = cowboy_req:binding(anything, Req, "nothing"),
-    {Int, Req2} = cowboy_req:binding(an_int, Req, -1),
-    {Chars, Req3} = cowboy_req:binding(three_chars, Req2, "not three chars"),
-    {IncInt, Req4} = cowboy_req:binding(add_one, Req3, -1),
-    {PathInfo, Req5} = cowboy_req:path_info(Req4),
+    {Int, Req3} = cowboy_req:binding(an_int, Req2, -1),
+    {Chars, Req4} = cowboy_req:binding(three_chars, Req3, "not three chars"),
+    {IncInt, Req5} = cowboy_req:binding(add_one, Req4, -1),
+    {PathInfo, Req6} = cowboy_req:path_info(Req5),
 
     io:format("Bindings:~n\tan_int: ~p~n\tthree_chars: ~p~n\tadd_one: ~p~n", [Int, Chars, IncInt]),
     io:format("Path Info: ~p~n", [PathInfo]),
@@ -45,7 +45,7 @@ handle(Req, State = #state{are_constraints_met = AreConstraintsMet}) ->
                        _ -> PathInfo
                    end,
 
-    {ok, Req6} = cowboy_req:reply(200,
+    {ok, Req7} = cowboy_req:reply(200,
         [{<<"content-type">>, <<"text/html">>}],
         ["<html><body>",
          "Constraints met? ", atom_to_list(AreConstraintsMet), "<br>",
@@ -55,8 +55,8 @@ handle(Req, State = #state{are_constraints_met = AreConstraintsMet}) ->
          "Third binding (incremented int): ", integer_to_list(IncInt), "<br>",
          "Path Info: ", SafePathInfo, "<br>",
          "</body></html>"],
-        Req5),
-    {ok, Req6, State}.
+        Req6),
+    {ok, Req7, State}.
 
 terminate(_Reason, _Req, _State) ->
 	ok.

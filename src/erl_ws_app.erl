@@ -49,7 +49,7 @@ start(_Type, _Args) ->
                    %{non_empty, nonempty}, %% not_implemented in this version
                   ],
 
-    Paths = [{"/hello", hello_handler, _Bindings = []},
+    Paths = [{"/hello", hello_handler, ?NO_OPTIONS = []},
              {"/", cowboy_static, {priv_file, erl_ws, "static/form.html"}},
              {"/form", form_handler, ?NO_OPTIONS},
              {"/chunked_form", chunked_handler, ?NO_OPTIONS},
@@ -57,11 +57,12 @@ start(_Type, _Args) ->
              {"/constraints/:an_int/:three_chars/[:add_one]", Constraints, constraints_handler, {constraints_met, true}},
              {"/constraints/[...]", constraints_handler, {constraints_met, false}},
              {"/websocket", websocket_handler, ?NO_OPTIONS},
-             {"/animate", animate_ws_handler, ?NO_OPTIONS},
-             {"/[...]", cowboy_static, {priv_dir, erl_ws, "static"}}],
+             {"/animate", animate_ws_handler, ?NO_OPTIONS}
+             {"/[...]", cowboy_static, {priv_dir, erl_ws, "static"}},
+             ],
 
     Routes = [{?ANY_HOST, Paths},
-              {"[...]", [{"/host_path_info/[...]", host_path_info_handler, ?NO_OPTIONS}]}],
+              {"[...]", [{"/hpi/[...]", host_path_info_handler, ?NO_OPTIONS}]}],
     %[...] in the host spec must be in a string
     %[...] in the path spec must follow a slash
 

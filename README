@@ -19,3 +19,7 @@ implemented a bunch of cowboy features for reference:
 - Reading request body in chunks
 - Sending response in chunks
 - Websocket (server handler and web page)
+
+I started building erl_boids in this app but moved it
+to its own repo at:
+https://github.com/cwmaguire/erl_boids

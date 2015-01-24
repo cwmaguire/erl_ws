@@ -3,6 +3,9 @@ Erlang Cowboy Webserver Experiment
 See https://www.youtube.com/watch?v=LTX2mkobDy4&feature=youtu.be
 for a walk-through of the project.
 
+See https://www.youtube.com/watch?v=LTX2mkobDy4
+for a walk-through of the Cowboy "Getting Started" tutorial.
+
 In order to build a Erlang application that would talk to a
 websocket I first when through the Cowboy user guide and
 implemented a bunch of cowboy features for reference:
